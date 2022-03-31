@@ -2,6 +2,9 @@ package com.binance.api.client.domain.account;
 
 import com.binance.api.client.constant.BinanceApiConstants;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.math.BigDecimal;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
@@ -20,12 +23,12 @@ public class AssetBalance {
   /**
    * Available balance.
    */
-  private String free;
+  private BigDecimal free;
 
   /**
    * Locked by open orders.
    */
-  private String locked;
+  private BigDecimal locked;
 
   public String getAsset() {
     return asset;
@@ -35,19 +38,19 @@ public class AssetBalance {
     this.asset = asset;
   }
 
-  public String getFree() {
+  public BigDecimal getFree() {
     return free;
   }
 
-  public void setFree(String free) {
+  public void setFree(BigDecimal free) {
     this.free = free;
   }
 
-  public String getLocked() {
+  public BigDecimal getLocked() {
     return locked;
   }
 
-  public void setLocked(String locked) {
+  public void setLocked(BigDecimal locked) {
     this.locked = locked;
   }
 

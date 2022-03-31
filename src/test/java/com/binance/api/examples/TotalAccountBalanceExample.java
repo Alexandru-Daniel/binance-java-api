@@ -1,5 +1,7 @@
 package com.binance.api.examples;
 
+import java.math.BigDecimal;
+
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.constant.Util;
@@ -13,19 +15,19 @@ public class TotalAccountBalanceExample {
 
 
     public static void main(String[] args) {
-        BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance("YOUR_API_KEY", "YOUR_SECRET");
-        BinanceApiRestClient client = factory.newRestClient();
-
-        // Get account balances
-        Account account = client.getAccount(60_000L, System.currentTimeMillis());
-
-        // Get total account balance in BTC (spot only)
-        TotalAccountBalanceExample accountBalance = new TotalAccountBalanceExample();
-        double totalBalanceInBTC = accountBalance.getTotalAccountBalance(client,account);
-        System.out.println(totalBalanceInBTC);
-        // Get total account balance in USDT (spot only)
-        double totalBalanceInUSDT = totalBalanceInBTC * Double.parseDouble(client.getPrice("BTCUSDT").getPrice());
-        System.out.println(totalBalanceInUSDT);
+//        BinanceApiClientFactory factory = BinanceApiClientFactory.newInstance("YOUR_API_KEY", "YOUR_SECRET");
+//        BinanceApiRestClient client = factory.newRestClient();
+//
+//        // Get account balances
+//        Account account = client.getAccount(60_000L, System.currentTimeMillis());
+//
+//        // Get total account balance in BTC (spot only)
+//        TotalAccountBalanceExample accountBalance = new TotalAccountBalanceExample();
+//        double totalBalanceInBTC = accountBalance.getTotalAccountBalance(client,account);
+//        System.out.println(totalBalanceInBTC);
+//        // Get total account balance in USDT (spot only)
+//        double totalBalanceInUSDT = totalBalanceInBTC * Double.parseDouble(client.getPrice("BTCUSDT").getPrice());
+//        System.out.println(totalBalanceInUSDT);
 
 
 
@@ -33,22 +35,22 @@ public class TotalAccountBalanceExample {
     }
 
     // Get total account balance in BTC (spot only)
-    public double getTotalAccountBalance(BinanceApiRestClient client, Account account) {
-        double totalBalance = 0;
+    public BigDecimal getTotalAccountBalance(BinanceApiRestClient client, Account account) {
+    	BigDecimal totalBalance = BigDecimal.ZERO;
         for (AssetBalance balance : account.getBalances()) {
-            double free = Double.parseDouble(balance.getFree());
-            double locked = Double.parseDouble(balance.getLocked());
+            BigDecimal free = balance.getFree();
+            BigDecimal locked = balance.getLocked();
             String ticker = balance.getAsset() + Util.BTC_TICKER;
             String tickerReverse = Util.BTC_TICKER + balance.getAsset();
-            if (free + locked != 0) {
+            if (free.add(locked).compareTo(BigDecimal.ZERO) != 0) {
                 if (Util.isFiatCurrency(balance.getAsset())) {
-                    double price = Double.parseDouble(client.getPrice(tickerReverse).getPrice());
-                    double amount = (free + locked) / price;
-                    totalBalance += amount;
+                	BigDecimal price = client.getPrice(tickerReverse).getPrice();
+                	BigDecimal amount = (free.add(locked)).divide(price);
+                    totalBalance = totalBalance.add(amount);
                 } else {
-                    double price = Double.parseDouble(client.getPrice(ticker).getPrice());
-                    double amount = price * (free + locked);
-                    totalBalance += amount;
+                	BigDecimal price = client.getPrice(ticker).getPrice();
+                	BigDecimal amount = price.multiply(free.add(locked));
+                    totalBalance = totalBalance.add(amount);
                 }
 
             }
